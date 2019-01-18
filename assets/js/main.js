@@ -1,4 +1,5 @@
-var playing = false;
+let playing = false;
+let justDone = false;
 var obj_winning;
 var items_order;
 
@@ -258,15 +259,19 @@ function playSound(cases) {
       snd.play();
       break;
     case "game_finished":
-      snd.src = "assets/audio/game_finished.mp3";
-      snd.play();
+      document.getElementById("bgFinished").play();
       break;
   }
 }
 
 function init() {
   //console.log("enter init.");
+  $("#winMsg").text("");
+  document.getElementById("bgFinished").pause();
+  document.getElementById("bgFinished").currentTime = 0;
+  playSound("game_idle");
   playing = false;
+  justDone = false;
   $(".popup-wrap").fadeOut(500);
   $(".logo").removeClass("selected");
 }
@@ -300,22 +305,22 @@ function play(no, runTimes, stopPlay, sec, order) {
       $("#no" + (no - 1)).addClass("selected");
     }
     if (order == 0) {
-
       $("#popup-result").fadeIn(500);
       playSound("game_finished");
 
+      showSlotMachine();
+
       setTimeout(function () {
+        showMsg();
+      }, 1600);
+
+      /*setTimeout(function () {
         showSlotMachine();
-      }, 1000);
-
-      showMsg();
+      }, 3000);*/
 
       setTimeout(function () {
-        playSound("game_idle");
-      }, 6000);
-
-      setTimeout(function () {
-        playing = false
+        playing = false;
+        justDone = true;
       }, 6200);
     }
   } else if (runTimes + 10 > stopPlay) {
@@ -394,8 +399,6 @@ function startToPlay() {
   obj_winning = JSON.parse(winning);
   items_order = new Array();
 
-  $("#winMsg").text(obj_winning.winning_msg.toString());
-
   while (loopTimes > 0) {
     var index = getRandom(0, obj_winning.items.length - 1);
     if (!contains.call(items_order, index)) {
@@ -419,34 +422,34 @@ function startToPlay() {
   }, i * 100);
   setTimeout(function () {
     play(no, runTimes, parseInt(stopTimes[1]) + 72, sec, 1);
-  }, i * 140);
+  }, i * 150);
   setTimeout(function () {
     play(no, runTimes, parseInt(stopTimes[2]) + 96, sec, 0);
-  }, i * 180);
+  }, i * 200);
 
   setTimeout(function () {
     playSound("game_starting")
-  }, 400);
+  }, 500);
 }
 
 function showSlotMachine() {
-  function onComplete(active) {}
-
-  machine1.shuffle(1, onComplete, 1, obj_winning.items[items_order[0]].id);
+  machine1.shuffle(1, "", 1, obj_winning.items[items_order[0]].id);
   setTimeout(
     () =>
-    machine2.shuffle(1, onComplete, 1, obj_winning.items[items_order[1]].id),
-    400
+    machine2.shuffle(1, "", 1, obj_winning.items[items_order[1]].id),
+    300
   );
   setTimeout(
     () =>
-    machine3.shuffle(1, onComplete, 1, obj_winning.items[items_order[2]].id),
-    800
+    machine3.shuffle(1, "", 1, obj_winning.items[items_order[2]].id),
+    600
   );
 }
 
 function showMsg() {
   $(".light").css("animation-duration", "1s");
+
+  $("#winMsg").text(obj_winning.winning_msg.toString());
 
   $(".ml2").each(function () {
     $(this).html(
@@ -483,7 +486,7 @@ function showMsg() {
 $(document).keypress(function (e) {
   // KeyCode: ENTER
   // Start to game
-  if (e.keyCode == 13 && playing == false) {
+  if (e.keyCode == 13 && playing == false && justDone == false) {
     init();
     playing = true;
 
@@ -497,6 +500,8 @@ $(document).keypress(function (e) {
     setTimeout(function () {
       startToPlay();
     }, 3500);
+  } else if (e.keyCode == 13 && playing == false && justDone == true) {
+    init();
   }
 });
 

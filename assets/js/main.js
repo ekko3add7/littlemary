@@ -7,6 +7,11 @@ const el1 = document.querySelector("#machine1");
 const el2 = document.querySelector("#machine2");
 const el3 = document.querySelector("#machine3");
 
+const fontAnimation = anime
+  .timeline({
+    loop: true
+  });
+
 const machine1 = new SlotMachine(el1, {
   active: 0,
 });
@@ -274,6 +279,9 @@ function init() {
   justDone = false;
   $(".popup-wrap").fadeOut(500);
   $(".logo").removeClass("selected");
+  fontAnimation.pause();
+  //fontAnimation.remove();
+  //$("#winMsg").removeClass("ml2");
 }
 
 function play(no, runTimes, stopPlay, sec, order) {
@@ -312,7 +320,7 @@ function play(no, runTimes, stopPlay, sec, order) {
 
       setTimeout(function () {
         showMsg();
-      }, 1600);
+      }, 1000);
 
       /*setTimeout(function () {
         showSlotMachine();
@@ -447,8 +455,6 @@ function showSlotMachine() {
 }
 
 function showMsg() {
-  $(".light").css("animation-duration", "1s");
-
   $("#winMsg").text(obj_winning.winning_msg.toString());
 
   $(".ml2").each(function () {
@@ -459,28 +465,24 @@ function showMsg() {
     );
   });
 
-  anime
+
+  fontAnimation = new anime
     .timeline({
       loop: true
-    })
-    .add({
-      targets: ".ml2 .letter",
+    }).add({
+      targets: '.ml2 .letter',
       scale: [4, 1],
       opacity: [0, 1],
       translateZ: 0,
       easing: "easeOutExpo",
-      duration: 950,
+      duration: 1300,
       delay: function (el, i) {
         return 70 * i;
       }
-    })
-    .add({
-      targets: ".ml2",
-      opacity: 0,
-      duration: 400,
-      easing: "easeOutExpo",
-      delay: 3000
     });
+  //fontAnimation.restart();
+
+
 }
 
 $(document).keypress(function (e) {
@@ -506,7 +508,10 @@ $(document).keypress(function (e) {
 });
 
 $(document).ready(function () {
+  $(".light").css("animation-duration", "1s");
   setTimeout(function () {
     $('.popup-wrap').addClass("nondisplay");
   }, 500);
+
+  fontAnimation.pause();
 });
